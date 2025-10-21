@@ -19,6 +19,7 @@ var (
 	randRange = rand.New(randSource)
 )
 
+// getTestParcel возвращает тестовую посылку
 func getTestParcel() Parcel {
 	return Parcel{
 		Client:    1000,
@@ -28,6 +29,7 @@ func getTestParcel() Parcel {
 	}
 }
 
+// TestAddGetDelete проверяет добавление, получение и удаление посылки
 func TestAddGetDelete(t *testing.T) {
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
@@ -124,7 +126,6 @@ func TestSetStatus(t *testing.T) {
 
 // TestGetByClient проверяет получение посылок по идентификатору клиента
 func TestGetByClient(t *testing.T) {
-	// Подготовка базы данных
 	// prepare
 	db, err := sql.Open("sqlite", "tracker.db")
 	require.NoError(t, err)
@@ -132,7 +133,6 @@ func TestGetByClient(t *testing.T) {
 
 	store := NewParcelStore(db)
 
-	// Создаем тестовые посылки
 	parcels := []Parcel{
 		getTestParcel(),
 		getTestParcel(),
@@ -142,13 +142,15 @@ func TestGetByClient(t *testing.T) {
 
 	// задаём всем посылкам один и тот же идентификатор клиента
 	client := randRange.Intn(10_000_000)
+	parcels[0].Client = client
+	parcels[1].Client = client
+	parcels[2].Client = client
 
-	// Присваиваем всем посылкам одного клиента
+	// add
 	for i := range parcels {
 		parcels[i].Client = client
 	}
 
-	// Добавляем посылки в базу данных
 	for i := 0; i < len(parcels); i++ {
 		// добавьте новую посылку в БД, убедитесь в отсутствии ошибки и наличии идентификатора
 		id, err := store.Add(parcels[i])
