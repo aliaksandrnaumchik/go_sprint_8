@@ -98,12 +98,30 @@ func (s ParcelService) Delete(number int) error {
 
 func main() {
 	// настройте подключение к БД
+	db, err := sql.Open("sqlite", "tracker.db")
+	if err != nil {
+		fmt.Printf("Ошибка при подключении к базе данных: %v\n", err)
+		return
+	}
 
-	store := // создайте объект ParcelStore функцией NewParcelStore
+	defer db.Close()
+
+	// Проверяем подключение
+	err = db.Ping()
+	if err != nil {
+		fmt.Printf("Ошибка при проверке подключения: %v\n", err)
+		return
+	}
+
+	fmt.Println("Подключение к базе данных успешно установлено")
+
+	store := NewParcelStore(db)
 	service := NewParcelService(store)
 
-	// регистрация посылки
+	// создаём клиента
 	client := 1
+
+	// регистрация посылки
 	address := "Псков, д. Пушкина, ул. Колотушкина, д. 5"
 	p, err := service.Register(client, address)
 	if err != nil {
